@@ -363,6 +363,239 @@ namespace air
 			}
 		}
 
+		void insert(T element, size_t position)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (position == 0)push_front(element);
+				else if (position >= next_pos)push_back(element);
+				else
+				{
+					if (next_pos + 1 <= max_size)
+					{
+						for (size_t i = next_pos; i > position; --i)mPtr[i] = mPtr[i - 1];
+
+						mPtr[position] = element;
+
+						++next_pos;
+					}
+					else
+					{
+						++max_size;
+
+						T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
+
+						if (!temp)throw EXCEPTION();
+						else
+						{
+							mPtr = temp;
+							temp = nullptr;
+
+							if (mPtr)
+							{
+								for (size_t i = next_pos; i > position; --i)mPtr[i] = mPtr[i - 1];
+
+								mPtr[position] = element;
+
+								++next_pos;
+							}
+						}
+					}
+				}
+			}
+		}
+		void insert(T* element, size_t position)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (position == 0)push_front(element);
+				else if (position >= next_pos)push_back(element);
+				else
+				{
+					if (next_pos + 1 <= max_size)
+					{
+						for (size_t i = next_pos; i > position; --i)mPtr[i] = mPtr[i - 1];
+
+						mPtr[position] = *element;
+
+						++next_pos;
+					}
+					else
+					{
+						++max_size;
+
+						T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
+
+						if (!temp)throw EXCEPTION();
+						else
+						{
+							mPtr = temp;
+							temp = nullptr;
+
+							if (mPtr)
+							{
+								for (size_t i = next_pos; i > position; --i)mPtr[i] = mPtr[i - 1];
+
+								mPtr[position] = *element;
+
+								++next_pos;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		class iterator
+		{
+		private:
+			T* it_ptr{ nullptr };
+			T* container_ptr{ nullptr };
+			size_t container_size{ 1 };
+
+		public:
+			friend class BAG<T>;
+
+			using iterator_category = std::contiguous_iterator_tag;
+			using value_type = T;
+			using difference_type = ptrdiff_t;
+			using pointer = T*;
+			using reference = T&;
+
+			iterator(T* init_ptr, BAG<T>& container)
+			{
+				it_ptr = init_ptr;
+				container_ptr = container.mPtr;
+				container_size = container.next_pos;
+			}
+
+			pointer operator-> () const
+			{
+				return it_ptr;
+			}
+			reference operator* () const
+			{
+				return *it_ptr;
+			}
+
+			friend operator== (const iterator& first, const iterator& second)
+			{
+				return(first.it_ptr == second.it_ptr);
+			}
+			friend operator>= (const iterator& first, const iterator& second)
+			{
+				return(first.it_ptr >= second.it_ptr);
+			}
+			friend operator<= (const iterator& first, const iterator& second)
+			{
+				return(first.it_ptr <= second.it_ptr);
+			}
+			friend operator> (const iterator& first, const iterator& second)
+			{
+				return(first.it_ptr > second.it_ptr);
+			}
+			friend operator< (const iterator& first, const iterator& second)
+			{
+				return(first.it_ptr < second.it_ptr);
+			}
+
+			iterator& operator++ ()
+			{
+				if (it_ptr >= container_ptr + container_size)throw EXCEPTION(ERR_ITERATOR);
+
+				++it_ptr;
+
+				return (*this);
+			}
+			iterator operator++ (int)
+			{
+				iterator temp{ (*this) };
+
+				if (it_ptr >= container_ptr + container_size)throw EXCEPTION(ERR_ITERATOR);
+
+				++(*this);
+
+				return temp;
+			}
+
+			iterator& operator-- ()
+			{
+				if (it_ptr < container_ptr)throw EXCEPTION(ERR_ITERATOR);
+
+				--it_ptr;
+
+				return (*this);
+			}
+			iterator operator-- (int)
+			{
+				iterator temp{ (*this) };
+
+				if (it_ptr < container_ptr)throw EXCEPTION(ERR_ITERATOR);
+
+				--(*this);
+
+				return temp;
+			}
+
+			iterator& operator+ (size_t step)
+			{
+				if (it_ptr >= container_ptr + container_size)throw EXCEPTION(ERR_ITERATOR);
+
+				it_ptr += step;
+
+				return (*this);
+			}
+			iterator& operator+= (size_t step)
+			{
+				if (it_ptr >= container_ptr + container_size)throw EXCEPTION(ERR_ITERATOR);
+
+				it_ptr += step;
+
+				return (*this);
+			}
+
+			iterator& operator- (size_t step)
+			{
+				if (it_ptr < container_ptr)throw EXCEPTION(ERR_ITERATOR);
+
+				it_ptr -= step;
+
+				return (*this);
+			}
+			iterator& operator-= (size_t step)
+			{
+				if (it_ptr < container_ptr)throw EXCEPTION(ERR_ITERATOR);
+
+				it_ptr -= step;
+
+				return (*this);
+			}
+		};
+
+		iterator begin()
+		{
+			return iterator(mPtr, (*this));
+		}
+		iterator end()
+		{
+			return iterator(mPtr + next_pos, (*this));
+		}
+
+		void erase(iterator which_element)
+		{
+			for (size_t i = 0; i < next_pos; ++i)
+			{
+				if (mPtr + i == which_element.it_ptr)
+				{
+					erase(i);
+					return;
+				}
+			}
+
+			throw EXCEPTION(ERR_ITERATOR);
+		}
 	};
 
 
