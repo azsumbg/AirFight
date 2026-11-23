@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="AirFight/AirFight.vcxproj" />
+  <Project Path="AirFight/AirFight.vcxproj" Id="f071b37f-fe75-475e-9137-bc98638d87ed" />
 </Solution>

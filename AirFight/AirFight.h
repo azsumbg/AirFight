@@ -42,7 +42,7 @@ namespace air
 		int _what{ ERR_UNKNOWN };
 
 	public:
-		EXCEPTION(int what_happened);
+		EXCEPTION(int what_happened = ERR_UNKNOWN);
 
 		const wchar_t* eGet()const;
 	};
@@ -72,6 +72,297 @@ namespace air
 		FADING(assets what, float sx, float sy);
 
 		float get_opacity();
+	};
+
+	template<typename T> class BAG
+	{
+	private:
+		size_t max_size{ 1 };
+		T* mPtr{ nullptr };
+		size_t next_pos{ 0 };
+
+	public:
+
+		BAG()
+		{
+			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+			if(!mPtr)throw EXCEPTION()
+		}
+		BAG(size_t lenght)
+		{
+			max_size = lenght;
+			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+			if (!mPtr)throw EXCEPTION();
+		}
+		BAG(BAG& other)
+		{
+			if (!other.mPtr)
+			{
+				mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+				if (!mPtr)throw EXCEPTION();
+			}
+			else
+			{
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+
+				mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+				if (!mPtr)throw EXCEPTION();
+				else if (next_pos > 0)for (size_t i = 0; i < next_pos; ++i)mPtr[i] = other.mPtr[i];
+			}
+		}
+		BAG(BAG&& other)
+		{
+			if (!other.mPtr)
+			{
+				mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+				if (!mPtr)throw EXCEPTION();
+			}
+			else
+			{
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+
+				mPtr = other.mPtr;
+
+				other.mPtr = nullptr;
+			}
+		}
+
+		BAG& operator= (BAG& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PARAM);
+			else
+			{
+				if (mPtr == other.mPtr)return (*this);
+				else
+				{
+					free(mPtr);
+
+					max_size = other.max_size;
+					next_pos = other.next_pos;
+
+					mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else if (next_pos > 0)for (size_t i = 0; i < next_pos; ++i)mPtr[i] = other.mPtr[i];
+				}
+			}
+
+			return (*this);
+		}
+		BAG& operator= (BAG&& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PARAM);
+			else
+			{
+				if (mPtr == other.mPtr)return (*this);
+				else
+				{
+					free(mPtr);
+
+					max_size = other.max_size;
+					next_pos = other.next_pos;
+
+					mPtr = other.mPtr;
+					other.mPtr = nullptr;
+				}
+			}
+
+			return (*this);
+		}
+
+		T& operator[] (size_t index)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else if (index >= next_pos)throw EXCEPTION(ERR_INDEX);
+			
+			return mPtr[index];
+		}
+
+		bool empty()const
+		{
+			return(next_pos == 0);
+		}
+		size_t size()const
+		{
+			return next_pos;
+		}
+		size_t capacity()const
+		{
+			return max_size;
+		}
+
+		void clear()
+		{
+			free(mPtr);
+
+			max_size = 1;
+			next_pos = 0;
+
+			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+			if (!mPtr)throw EXCEPTION();
+		}
+
+		void push_front(T element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t index = next_pos; index > 0; --index)mPtr[index] = mPtr[index - 1];
+					
+					*mPtr = element;
+					
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
+					if (!temp)throw EXCEPTION();
+					else
+					{
+						mPtr = temp;
+						temp = nullptr;
+
+						if (mPtr)
+						{
+							for (size_t index = next_pos; index > 0; --index)mPtr[index] = mPtr[index - 1];
+
+							*mPtr = element;
+
+							++next_pos;
+						}
+					}
+				}
+			}
+		}
+		void push_front(T* element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t index = next_pos; index > 0; --index)mPtr[index] = mPtr[index - 1];
+
+					*mPtr = *element;
+
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
+					if (!temp)throw EXCEPTION();
+					else
+					{
+						mPtr = temp;
+						temp = nullptr;
+
+						if (mPtr)
+						{
+							for (size_t index = next_pos; index > 0; --index)mPtr[index] = mPtr[index - 1];
+
+							*mPtr = *element;
+
+							++next_pos;
+						}
+					}
+				}
+			}
+		}
+
+		void push_back(T element)
+		{
+			if (!mPtr)throw EXCEPTION();
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					mPtr[next_pos] = element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					T* temp{ reinterpret_cast<T * (realloc(mPtr, max_size * sizeof(T))) };
+
+					if (!temp)throw EXCEPTION();
+					else
+					{
+						mPtr = temp;
+						temp = nullptr;
+
+						if (mPtr)mPtr[next_pos] = element;
+
+						++next_pos;
+					}
+				}
+			}
+		}
+		void push_back(T* element)
+		{
+			if (!mPtr)throw EXCEPTION();
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					mPtr[next_pos] = *element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					T* temp{ reinterpret_cast<T * (realloc(mPtr, max_size * sizeof(T))) };
+
+					if (!temp)throw EXCEPTION();
+					else
+					{
+						mPtr = temp;
+						temp = nullptr;
+
+						if (mPtr)mPtr[next_pos] = *element;
+
+						++next_pos;
+					}
+				}
+			}
+		}
+
+		void erase(size_t index)
+		{
+			if (!mPtr)throw EXCEPTION();
+			else
+			{
+				if (index >= next_pos)throw EXCEPTION(ERR_PARAM);
+
+				for (size_t i = index; i < next_pos; ++i)mPtr[i] = mPtr[i + 1];
+
+				--max_size;
+				--next_pos;
+
+				T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
+
+				if (!temp)throw EXCEPTION();
+				else
+				{
+					mPtr = temp;
+					temp = nullptr;
+				}
+			}
+		}
+
 	};
 
 
