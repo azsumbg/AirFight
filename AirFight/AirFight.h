@@ -17,7 +17,7 @@ constexpr float scr_height{ 800.0f };
 constexpr float sky{ 50.0f };
 constexpr float ground{ 750.0f };
 
-constexpr float nature_speed{ 1.0f };
+constexpr float nature_speed{ 0.5f };
 
 constexpr D2D1_RECT_F FULL_SCREEN{ 0.0f, 0.0f, scr_width, scr_height };
 constexpr D2D1_RECT_F GAME_SCREEN{ 0.0f, sky, scr_width, ground };
@@ -645,6 +645,31 @@ namespace air
 
 		float get_move_ex()const;
 		float get_move_ey()const;
+	};
+
+	class AIRFIGHT_API FIELD :public PROTON
+	{
+	private:
+		fields type{ fields::intro };
+
+		int frame{ 0 };
+		int frame_delay{ 0 };
+		int max_frames{ 0 };
+		int max_frame_delay{ 0 };
+
+		FIELD(fields _what, float _sx, float _sy);
+
+	public:
+
+		fields get_type() const;
+
+		int get_frame();
+
+		bool move(dirs to_where, float gear);
+
+		void Release();
+
+		static FIELD* create(fields what, float sx, float sy);
 	};
 
 }

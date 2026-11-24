@@ -246,3 +246,117 @@ float air::PROTON::get_move_ey()const
 }
 
 //////////////////////////////////////////
+
+// FIELD CLASS ***************************
+
+air::FIELD::FIELD(fields _what, float _sx, float _sy) :PROTON(_sx, _sy)
+{
+	type = _what;
+
+	switch (type)
+	{
+	case fields::bridge:
+		new_dims(1000.0f, 700.0f);
+		max_frames = 3;
+		frame_delay = 22;
+		break;
+
+	case fields::isle:
+		new_dims(1000.0f, 700.0f);
+		max_frames = 9;
+		frame_delay = 7;
+		break;
+
+	case fields::river:
+		new_dims(1000.0f, 700.0f);
+		max_frames = 88;
+		frame_delay = 1;
+		break;
+
+	case fields::intro:
+		new_dims(1000.0f, 800.0f);
+		max_frames = 71;
+		frame_delay = 1;
+		break;
+
+	case fields::pause:
+		new_dims(1000.0f, 800.0f);
+		max_frames = 16;
+		frame_delay = 4;
+		break;
+
+	case fields::small_cloud:
+		new_dims(120.0f, 63.0f);
+		speed = 0.8f;
+		break;
+
+	case fields::mid_cloud:
+		new_dims(180.0f, 81.0f);
+		speed = 0.7f;
+		break;
+
+	case fields::big_cloud:
+		new_dims(200.0f, 79.0f);
+		speed = 0.6f;
+		break;
+	}
+
+	max_frame_delay = frame_delay;
+}
+
+fields air::FIELD::get_type() const
+{
+	return type;
+}
+
+int air::FIELD::get_frame()
+{
+	--frame_delay;
+
+	if (frame_delay <= 0)
+	{
+		frame_delay = max_frame_delay;
+
+		++frame;
+
+		if (frame > max_frames)frame = 0;
+	}
+
+	return frame;
+}
+		
+bool air::FIELD::move(dirs to_where, float gear)
+{
+	if (type == fields::intro || type == fields::pause)return true;
+
+	float my_speed = speed + gear / 10.0f;
+
+	switch (to_where)
+	{
+	case dirs::left:
+		start.x -= my_speed;
+		set_edges();
+		if (end.x <= -scr_width)return false;
+		break;
+
+	case dirs::right:
+		start.x += my_speed;
+		set_edges();
+		if (start.x >= 2.0f * scr_width)return false;
+		break;
+	}
+
+	return true;
+}
+
+void air::FIELD::Release() 
+{
+	delete this;
+}
+
+air::FIELD* air::FIELD::create(fields what, float sx, float sy)
+{
+	return new FIELD(what, sx, sy);
+}
+
+//////////////////////////////////////////
