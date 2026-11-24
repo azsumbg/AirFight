@@ -60,7 +60,7 @@ float air::RANDIT::operator() (float min, float max)
 
 //////////////////////////////////////////
 
-//FADING CLASS ***************************
+// FADING CLASS ***************************
 
 air::FADING::FADING(assets what, float sx, float sy)
 {
@@ -83,6 +83,166 @@ float air::FADING::get_opacity()
 	}
 
 	return opacity;
+}
+
+//////////////////////////////////////////
+
+// PROTON CLASS **************************
+
+air::PROTON::PROTON(float sx = 0, float sy = 0)
+{
+	start.x = sx;
+	start.y = sy;
+
+	x_rad = _width / 2.0f;
+	y_rad = _height / 2.0f;
+
+	center.x = start.x + x_rad;
+	center.y = start.y + y_rad;
+
+	end.x = start.x + _width;
+	end.y = start.y + _height;
+
+	rect.left = start.x;
+	rect.top = start.y;
+	rect.right = end.x;
+	rect.bottom = end.y;
+}
+air::PROTON::PROTON(float sx, float sy, float first_width, float first_height)
+{
+	start.x = sx;
+	start.y = sy;
+
+	_width = first_width;
+	_height = first_height;
+
+	x_rad = _width / 2.0f;
+	y_rad = _height / 2.0f;
+
+	center.x = start.x + x_rad;
+	center.y = start.y + y_rad;
+
+	end.x = start.x + _width;
+	end.y = start.y + _height;
+
+	rect.left = start.x;
+	rect.top = start.y;
+	rect.right = end.x;
+	rect.bottom = end.y;
+}
+air::PROTON::PROTON(D2D1_POINT_2F start_point, float first_width, float first_height)
+{
+	start.x = start_point.x;
+	start.y = start_point.y;
+
+	_width = first_width;
+	_height = first_height;
+
+	x_rad = _width / 2.0f;
+	y_rad = _height / 2.0f;
+
+	center.x = start.x + x_rad;
+	center.y = start.y + y_rad;
+
+	end.x = start.x + _width;
+	end.y = start.y + _height;
+
+	rect.left = start.x;
+	rect.top = start.y;
+	rect.right = end.x;
+	rect.bottom = end.y;
+}
+
+void air::PROTON::set_edges()
+{
+	center.x = start.x + x_rad;
+	center.y = start.y + y_rad;
+
+	end.x = start.x + _width;
+	end.y = start.y + _height;
+
+	rect.left = start.x;
+	rect.top = start.y;
+	rect.right = end.x;
+	rect.bottom = end.y;
+}
+void air::PROTON::set_width(float new_width)
+{
+	_width = new_width;
+	
+	x_rad = _width / 2.0f;
+	
+	center.x = start.x + x_rad;
+	
+	end.x = start.x + _width;
+	
+	rect.right = end.x;
+}
+void air::PROTON::set_height(float new_height)
+{
+	_height = new_height;
+
+	y_rad = _height / 2.0f;
+
+	center.y = start.y + y_rad;
+
+	end.y = start.y + _height;
+
+	rect.bottom = end.y;
+}
+void air::PROTON::new_dims(float new_width, float new_height)
+{
+	_width = new_width;
+	_height = new_height;
+
+	x_rad = _width / 2.0f;
+	y_rad = _height / 2.0f;
+
+	center.x = start.x + x_rad;
+	center.y = start.y + y_rad;
+
+	end.x = start.x + _width;
+	end.y = start.y + _height;
+
+	rect.left = start.x;
+	rect.top = start.y;
+	rect.right = end.x;
+	rect.bottom = end.y;
+}
+
+void air::PROTON::set_path(float ex, float ey)
+{
+	move_sx = start.x;
+	move_sy = start.y;
+
+	move_ex = ex;
+	move_ey = ey;
+
+	float delta_x = move_ex - move_sx;
+	float delta_y = move_ey - move_sy;
+
+	float vec_lenght = (float)(sqrt(pow(delta_x, 2) + pow(delta_y, 2)));
+
+	move_next_x = delta_x / vec_lenght;
+	move_next_y = delta_y / vec_lenght;
+}
+
+float air::PROTON::get_width()const
+{
+	return _width;
+}
+float air::PROTON::get_height()const
+{
+	return _height;
+}
+
+float air::PROTON::get_move_ex()const
+{
+	return move_ex;
+}
+float air::PROTON::get_move_ey()const
+{
+	return move_ey;
 }
 
 //////////////////////////////////////////

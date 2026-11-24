@@ -17,6 +17,8 @@ constexpr float scr_height{ 800.0f };
 constexpr float sky{ 50.0f };
 constexpr float ground{ 750.0f };
 
+constexpr float nature_speed{ 1.0f };
+
 constexpr D2D1_RECT_F FULL_SCREEN{ 0.0f, 0.0f, scr_width, scr_height };
 constexpr D2D1_RECT_F GAME_SCREEN{ 0.0f, sky, scr_width, ground };
 
@@ -598,5 +600,51 @@ namespace air
 		}
 	};
 
+	class AIRFIGHT_API PROTON
+	{
+	protected:
+		float _width{ 1.0f };
+		float _height{ 1.0f };
+
+		float move_sx{ 0 };
+		float move_ex{ 0 };
+
+		float move_sy{ 0 };
+		float move_ey{ 0 };
+
+		float move_next_x{ 1.0f };
+		float move_next_y{ 1.0f };
+
+		float speed{ nature_speed };
+
+	public:
+		D2D1_POINT_2F start{ 0 };
+		D2D1_POINT_2F end{ 0 };
+		D2D1_POINT_2F center{ 0 };
+
+		D2D1_RECT_F rect{};
+
+		float x_rad{ 0 };
+		float y_rad{ 0 };
+
+		PROTON(float sx = 0, float sy = 0);
+		PROTON(float sx, float sy, float first_width, float first_height);
+		PROTON(D2D1_POINT_2F start_point, float first_width, float first_height);
+
+		virtual ~PROTON() {};
+
+		void set_edges();
+		void set_width(float new_width);
+		void set_height(float new_height);
+		void new_dims(float new_width, float new_height);
+
+		void set_path(float ex, float ey);
+
+		float get_width()const;
+		float get_height()const;
+
+		float get_move_ex()const;
+		float get_move_ey()const;
+	};
 
 }
