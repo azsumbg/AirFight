@@ -28,6 +28,8 @@ constexpr int ERR_INDEX{ 6003 };
 constexpr int ERR_UNKNOWN{ 6004 };
 constexpr int ERR_ITERATOR{ 6005 };
 
+constexpr int EXPLOSION_ENDED{ -1 };
+
 enum class dirs { stop = 0, left = 1, right = 2, up = 3, down = 4, up_left = 5, up_right = 6, down_left = 7, down_right = 8 };
 
 enum class assets { armor = 0, gun = 1, points = 2, repair = 3 };
@@ -695,5 +697,22 @@ namespace air
 		void Release();
 
 		static SHOT* create(ammo what, float sx, float sy, float ex, float ey, int damage_init);
+	};
+
+	class AIRFIGHT_API EXPLOSION: public PROTON
+	{
+	private:
+		int frame{ 0 };
+		int frame_delay{ 3 };
+		int max_frame_delay{ 3 };
+
+		EXPLOSION(float _sx, float _sy);
+
+	public:
+		int get_frame();
+
+		void Release();
+
+		static EXPLOSION* create(float sx, float sy);
 	};
 }

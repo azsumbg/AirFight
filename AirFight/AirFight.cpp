@@ -450,3 +450,31 @@ air::SHOT* air::SHOT::create(ammo what, float sx, float sy, float ex, float ey, 
 }
 
 //////////////////////////////////////////
+
+// EXPLOSION CLASS ***********************
+
+air::EXPLOSION::EXPLOSION(float _sx, float _sy) :PROTON(_sx, _sy, 100.0f, 114.0f) {};
+int air::EXPLOSION::get_frame()
+{
+	--frame_delay;
+	if (frame_delay <= 0)
+	{
+		frame_delay = max_frame_delay;
+		++frame;
+		if (frame > 23)return EXPLOSION_ENDED;
+	}
+
+	return frame;
+}
+
+void air::EXPLOSION::Release()
+{
+	delete this;
+}
+
+air::EXPLOSION* air::EXPLOSION::create(float sx, float sy)
+{
+	return new EXPLOSION(sx, sy);
+}
+
+///////////////////////////////////////////
