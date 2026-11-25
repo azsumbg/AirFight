@@ -478,3 +478,127 @@ air::EXPLOSION* air::EXPLOSION::create(float sx, float sy)
 }
 
 ///////////////////////////////////////////
+
+// HERO CLASS ****************************
+
+air::HERO::HERO(float sx, float sy) :PROTON(sx, sy, 84.0f, 100.0f) 
+{
+	set_path(center.x, sky);
+};
+
+void air::HERO::set_angle(dirs rotation_dir)
+{
+	if (rotation_dir == dirs::left)
+	{
+		if (move_ex - 10.0f > 0) set_path(move_ex - 10.0f, move_ey);
+		else
+		{
+			set_path(0, move_ey);
+			fly_angle = 270.0f;
+			return;
+		}
+
+		if (move_ex == center.x)
+		{
+			fly_angle = 0;
+			return;
+		}
+		else if (move_ex > center.x)
+		{
+			float opposite{ 0 };
+			float adjanced{ 0 };
+
+			opposite = move_ex - center.x;
+			adjanced = center.y - sky;
+
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+		}
+		else if (move_ex < center.x)
+		{
+			float opposite{ 0 };
+			float adjanced{ 0 };
+
+			opposite = center.x - move_ex;
+			adjanced = center.y - sky;
+
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle += 270.0f;
+		}
+	}
+	else if (rotation_dir == dirs::right)
+	{
+		if (move_ex + 10.0f < scr_width) set_path(move_ex + 10.0f, move_ey);
+		else
+		{
+			set_path(scr_width, move_ey);
+			fly_angle = 90.0f;
+			return;
+		}
+
+		if (move_ex == center.x)
+		{
+			fly_angle = 0;
+			return;
+		}
+		else if (move_ex > center.x)
+		{
+			float opposite{ 0 };
+			float adjanced{ 0 };
+
+			opposite = move_ex - center.x;
+			adjanced = center.y - sky;
+
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+		}
+		else if (move_ex < center.x)
+		{
+			float opposite{ 0 };
+			float adjanced{ 0 };
+
+			opposite = center.x - move_ex;
+			adjanced = center.y - sky;
+
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle += 270.0f;
+		}
+	}
+}
+
+float air::HERO::get_angle() const
+{
+	return fly_angle;
+}
+
+void air::HERO::move(float gear)
+{
+	float my_speed = speed * 4.0f + gear / 5.0f;
+
+	start.x += move_next_x * my_speed;
+	start.y += move_next_y * my_speed;
+	set_edges();
+
+	if (start.x < 0)
+	{
+		start.x = 0;
+		set_edges();
+	}
+	if (end.x > scr_width)
+	{
+		end.x = scr_width;
+		start.x = end.x - _width;
+		set_edges();
+	}
+	if (start.y < sky)
+	{
+		start.y = sky;
+		set_edges();
+	}
+	if (end.y > ground)
+	{
+		end.y = ground;
+		start.y = end.y - _height;
+		set_edges();
+	}
+}
+
+/////////////////////////////////////////

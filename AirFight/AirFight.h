@@ -50,6 +50,7 @@ namespace air
 
 		const wchar_t* eGet()const;
 	};
+	
 	class AIRFIGHT_API RANDIT
 	{
 	private:
@@ -62,6 +63,7 @@ namespace air
 		int operator() (int min, int max);
 		float operator() (float min, float max);
 	};
+	
 	class AIRFIGHT_API FADING
 	{
 	private:
@@ -715,4 +717,32 @@ namespace air
 
 		static EXPLOSION* create(float sx, float sy);
 	};
+
+	class AIRFIGHT_API HERO :public PROTON
+	{
+	private:
+		int frame{ 0 };
+		int max_frames{ 5 };
+		int frame_delay{ 12 };
+
+		float fly_angle{ 0 };
+
+	public:
+		int armor{ 1 };
+		int damage{ 5 };
+		int lifes{ 100 };
+
+		HERO(float sx, float sy);
+
+		void set_angle(dirs rotation_dir);
+
+		float get_angle() const;
+
+		void move(float gear);
+	};
+
+
+
+
+
 }
