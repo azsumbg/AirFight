@@ -672,4 +672,28 @@ namespace air
 		static FIELD* create(fields what, float sx, float sy);
 	};
 
+	class AIRFIGHT_API SHOT :public PROTON
+	{
+	private:
+		ammo type{ ammo::bullet };
+
+		float altitude{ 1.0f };
+
+		int altitude_delay{ 40 };
+		int max_altitude_delay{ 40 };
+
+		SHOT(ammo _what, float _sx, float _sy, float _ex, float _ey, int _damage);
+
+	public:
+		int damage{ 0 };
+		bool explode = false;
+
+		bool move(float gear);
+
+		ammo get_type() const;
+
+		void Release();
+
+		static SHOT* create(ammo what, float sx, float sy, float ex, float ey, int damage_init);
+	};
 }

@@ -344,6 +344,18 @@ bool air::FIELD::move(dirs to_where, float gear)
 		set_edges();
 		if (start.x >= 2.0f * scr_width)return false;
 		break;
+
+	case dirs::down:
+		start.y += my_speed;
+		set_edges();
+		if (start.y >= 2.0f * scr_height)return false;
+		break;
+
+	case dirs::up:
+		start.y -= my_speed;
+		set_edges();
+		if (end.y <= -scr_height)return false;
+		break;
 	}
 
 	return true;
@@ -357,6 +369,84 @@ void air::FIELD::Release()
 air::FIELD* air::FIELD::create(fields what, float sx, float sy)
 {
 	return new FIELD(what, sx, sy);
+}
+
+//////////////////////////////////////////
+
+// SHOT CLASS ****************************
+
+air::SHOT::SHOT(ammo _what, float _sx, float _sy, float _ex, float _ey, int _damage) :PROTON(_sx, _sy)
+{
+	type = _what;
+	damage = _damage;
+
+	switch (type)
+	{
+	case ammo::bomb:
+		new_dims(15.0f, 49.0f);
+		speed = nature_speed + 0.3f;
+		break;
+
+	case ammo::bullet:
+		new_dims(15.0f, 15.0f);
+		speed = 5.0f;
+		break;
+	}
+
+	if (type == ammo::bullet)set_path(_ex, _ey);
+}
+
+bool air::SHOT::move(float gear)
+{
+	float my_speed{ speed + gear / 5.0f };
+
+	if (type == ammo::bomb)
+	{
+		--altitude_delay;
+
+		if (altitude_delay <= 0)
+		{
+			altitude_delay = max_altitude_delay;
+			altitude -= 0.1f;
+
+			float width_specifier{ (rect.right - rect.left) * altitude };
+			float height_specifier{ (rect.bottom - rect.top) * altitude };
+
+			end.x = start.x + width_specifier;
+			end.y = start.y + height_specifier;
+			
+			rect.right = end.x;
+			rect.bottom = end.y;
+
+			if (altitude <= 0)return false;
+		}
+	}
+	else
+	{
+		start.x += move_next_x * my_speed;
+		start.y += move_next_y * my_speed;
+
+		set_edges();
+
+		if (end.x <= 0 || start.x >= scr_width || end.y <= sky || start.y >= ground)return false;
+	}
+
+	return true;
+}
+
+ammo air::SHOT::get_type() const
+{
+	return type;
+}
+
+void air::SHOT::Release()
+{
+	delete this;
+}
+
+air::SHOT* air::SHOT::create(ammo what, float sx, float sy, float ex, float ey, int damage_init)
+{
+	return new SHOT(what, sx, sy, ex, ey, damage_init);
 }
 
 //////////////////////////////////////////
