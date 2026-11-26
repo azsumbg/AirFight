@@ -741,7 +741,40 @@ namespace air
 		void move(float gear);
 	};
 
+	class AIRFIGHT_API EVILS: public PROTON
+	{
+	private:
+		int frame{ 0 };
+		int max_frames{ 0 };
+		int frame_delay{ 0 };
+		int max_frame_delay{ 0 };
 
+		int attack_delay{ 0 };
+		int max_attack_delay{ 0 };
+
+		float fly_angle{ 0 };
+
+		EVILS(evils _what, float _sx, float _sy);
+
+	public:
+		evils type{ evils::amphibia };
+		int lifes{ 0 };
+		int damage{ 0 };
+		int armor{ 0 };
+
+		bool move(float gear);
+
+		void set_fly_angle(float sx, float sy);
+		float get_fly_angle() const;
+
+		int get_frame();
+
+		int attack();
+
+		void Release();
+
+		static EVILS* create(evils what, float sx, float sy);
+	};
 
 
 

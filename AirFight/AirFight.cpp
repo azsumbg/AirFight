@@ -602,3 +602,182 @@ void air::HERO::move(float gear)
 }
 
 /////////////////////////////////////////
+
+// EVILS CLASS **************************
+
+air::EVILS::EVILS(evils _what, float _sx, float _sy) :PROTON(_sx, _sy)
+{
+	type = _what;
+
+	switch (type)
+	{
+	case evils::amphibia:
+		new_dims(120.0f, 58.0f);
+		speed = 0.6f;
+		lifes = 100;
+		damage = 10;
+		armor = 1;
+		max_frames = 5;
+		frame_delay = 14;
+		attack_delay = 120;
+		break;
+
+	case evils::bomber:
+		new_dims(100.0f, 152.0f);
+		speed = 0.7f;
+		lifes = 120;
+		damage = 15;
+		armor = 1;
+		max_frames = 5;
+		frame_delay = 14;
+		attack_delay = 150;
+		break;
+
+	case evils::boss1:
+		new_dims(300.0f, 300.0f);
+		speed = 0.4f;
+		lifes = 250;
+		damage = 25;
+		armor = 3;
+		max_frames = 3;
+		frame_delay = 20;
+		attack_delay = 180;
+		break;
+
+	case evils::boss2:
+		new_dims(300.0f, 215.0f);
+		speed = 0.4f;
+		lifes = 250;
+		damage = 25;
+		armor = 3;
+		max_frames = 1;
+		frame_delay = 60;
+		attack_delay = 180;
+		break;
+
+	case evils::small_fighter:
+		new_dims(42.0f, 80.0f);
+		speed = 0.9f;
+		lifes = 80;
+		damage = 5;
+		armor = 0;
+		max_frames = 9;
+		frame_delay = 14;
+		attack_delay = 80;
+		break;
+
+	case evils::fighter:
+		new_dims(76.0f, 90.0f);
+		speed = 0.8f;
+		lifes = 90;
+		damage = 8;
+		armor = 1;
+		max_frames = 60;
+		frame_delay = 1;
+		attack_delay = 90;
+		break;
+	}
+
+	max_attack_delay = attack_delay;
+	max_frame_delay = frame_delay;
+}
+
+bool air::EVILS::move(float gear)
+{
+	float my_speed = speed + gear / 10.0f;
+
+	start.x += move_next_x * my_speed;
+	start.y += move_next_y * my_speed;
+	set_edges();
+
+	if (start.x < 0)
+	{
+		start.x = 0;
+		set_edges();
+	}
+	if (end.x > scr_width)
+	{
+		end.x = scr_width;
+		start.x = end.x - _width;
+		set_edges();
+	}
+	if (start.y < sky)
+	{
+		start.y = sky;
+		set_edges();
+	}
+	if (end.y > ground)
+	{
+		end.y = ground;
+		start.y = end.y - _height;
+		set_edges();
+	}
+
+	return true;
+}
+
+void air::EVILS::set_fly_angle(float sx, float sy)
+{
+	float oppos{ 0 };
+	float adjanced{ ground - center.y };
+
+	if (move_ex == center.x)
+	{
+		fly_angle = 0;
+		return;
+	}
+	else if (move_ex < center.x)oppos = center.x - move_ex;
+	else if (move_ex > center.x)oppos = move_ex - center.x;
+	
+	if (move_ey == center.y)
+	{
+		if (move_ex == center.x)fly_angle = 0;
+		else if (move_ex < center.x)fly_angle = 90.0f;
+		else if (move_ex > center.x)fly_angle = 270.0f;
+		
+		return;
+	}
+
+	fly_angle = std::atan2f(oppos, adjanced) + (180.0f / 3.1415);
+}
+float air::EVILS::get_fly_angle() const
+{
+	return fly_angle;
+}
+
+int air::EVILS::get_frame()
+{
+	--frame_delay;
+
+	if (frame_delay <= 0)
+	{
+		frame_delay = max_frame_delay;
+		++frame;
+		if (frame > max_frames)frame = 0;
+	}
+	
+	return frame;
+}
+
+int air::EVILS::attack()
+{
+	--attack_delay;
+	if (attack_delay <= 0)
+	{
+		attack_delay = max_attack_delay;
+		return damage;
+	}
+	return 0;
+}
+
+void air::EVILS::Release()
+{
+	delete this;
+}
+
+air::EVILS* air::EVILS::create(evils what, float sx, float sy)
+{
+	return new EVILS(what, sx, sy);
+}
+
+/////////////////////////////////////////
