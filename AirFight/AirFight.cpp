@@ -89,7 +89,7 @@ float air::FADING::get_opacity()
 
 // PROTON CLASS **************************
 
-air::PROTON::PROTON(float sx = 0, float sy = 0)
+air::PROTON::PROTON(float sx, float sy)
 {
 	start.x = sx;
 	start.y = sy;
@@ -511,7 +511,7 @@ void air::HERO::set_angle(dirs rotation_dir)
 			opposite = move_ex - center.x;
 			adjanced = center.y - sky;
 
-			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415f);
 		}
 		else if (move_ex < center.x)
 		{
@@ -521,7 +521,7 @@ void air::HERO::set_angle(dirs rotation_dir)
 			opposite = center.x - move_ex;
 			adjanced = center.y - sky;
 
-			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415f);
 			fly_angle += 270.0f;
 		}
 	}
@@ -548,7 +548,7 @@ void air::HERO::set_angle(dirs rotation_dir)
 			opposite = move_ex - center.x;
 			adjanced = center.y - sky;
 
-			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415f);
 		}
 		else if (move_ex < center.x)
 		{
@@ -558,7 +558,7 @@ void air::HERO::set_angle(dirs rotation_dir)
 			opposite = center.x - move_ex;
 			adjanced = center.y - sky;
 
-			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415);
+			fly_angle = std::atan2f(opposite, adjanced) + (180.0f / 3.1415f);
 			fly_angle += 270.0f;
 		}
 	}
@@ -680,6 +680,12 @@ air::EVILS::EVILS(evils _what, float _sx, float _sy) :PROTON(_sx, _sy)
 
 	max_attack_delay = attack_delay;
 	max_frame_delay = frame_delay;
+
+	float tx{ scr_width + 200.0f};
+
+	if (center.x > scr_width / 2.0f)tx = -scr_width / 3.0f;
+
+	set_path(tx, ground);
 }
 
 void air::EVILS::move(float gear)
@@ -894,7 +900,7 @@ void air::EVILS::set_fly_angle(float sx, float sy)
 		return;
 	}
 
-	fly_angle = std::atan2f(oppos, adjanced) + (180.0f / 3.1415);
+	fly_angle = std::atan2f(oppos, adjanced) + (180.0f / 3.1415f);
 }
 
 float air::EVILS::get_fly_angle() const
@@ -980,4 +986,23 @@ bool air::Intersect(D2D1_RECT_F first, D2D1_RECT_F second)
 {
 	return (!(first.left >= second.right || first.right <= second.left || first.top >= second.bottom || first.bottom <= 
 		second.top));
+}
+
+void air::EvilNextMove(EVILS& evil, BAG<D2D1_RECT_F>& assets, D2D1_POINT_2F hero_center)
+{
+	if (Distance(evil.center, hero_center) < 200.0f)
+	{
+		evil.state = states::attack;
+		return;
+	}
+	else if (!assets.empty())
+	{
+		Sort(assets, evil.center);
+		
+		D2D1_POINT_2F asset_center{ D2D1_POINT_2F(assets[0].left + (assets[0].right - assets[0].left) / 2.0f,
+			assets[0].top + (assets[0].bottom - assets[0].top) / 2.0f) };
+		
+		evil.set_path(asset_center.x, asset_center.y);
+		evil.state = states::move;
+	}
 }

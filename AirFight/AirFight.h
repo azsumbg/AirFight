@@ -94,7 +94,7 @@ namespace air
 		{
 			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
 
-			if(!mPtr)throw EXCEPTION()
+			if (!mPtr)throw EXCEPTION();
 		}
 		BAG(size_t lenght)
 		{
@@ -302,7 +302,7 @@ namespace air
 				{
 					++max_size;
 
-					T* temp{ reinterpret_cast<T * (realloc(mPtr, max_size * sizeof(T))) };
+					T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
 
 					if (!temp)throw EXCEPTION();
 					else
@@ -331,7 +331,7 @@ namespace air
 				{
 					++max_size;
 
-					T* temp{ reinterpret_cast<T * (realloc(mPtr, max_size * sizeof(T))) };
+					T* temp{ reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T))) };
 
 					if (!temp)throw EXCEPTION();
 					else
@@ -487,23 +487,23 @@ namespace air
 				return *it_ptr;
 			}
 
-			friend operator== (const iterator& first, const iterator& second)
+			friend bool operator== (const iterator& first, const iterator& second)
 			{
 				return(first.it_ptr == second.it_ptr);
 			}
-			friend operator>= (const iterator& first, const iterator& second)
+			friend bool operator>= (const iterator& first, const iterator& second)
 			{
 				return(first.it_ptr >= second.it_ptr);
 			}
-			friend operator<= (const iterator& first, const iterator& second)
+			friend bool operator<= (const iterator& first, const iterator& second)
 			{
 				return(first.it_ptr <= second.it_ptr);
 			}
-			friend operator> (const iterator& first, const iterator& second)
+			friend bool operator> (const iterator& first, const iterator& second)
 			{
 				return(first.it_ptr > second.it_ptr);
 			}
-			friend operator< (const iterator& first, const iterator& second)
+			friend bool operator< (const iterator& first, const iterator& second)
 			{
 				return(first.it_ptr < second.it_ptr);
 			}
@@ -784,4 +784,6 @@ namespace air
 	float AIRFIGHT_API Distance(D2D1_POINT_2F first, D2D1_POINT_2F second);
 	void AIRFIGHT_API Sort(BAG<D2D1_RECT_F>& bag, D2D1_POINT_2F ref_point);
 	bool AIRFIGHT_API Intersect(D2D1_RECT_F first, D2D1_RECT_F second);
+
+	void AIRFIGHT_API EvilNextMove(EVILS& evil, BAG<D2D1_RECT_F>& assets, D2D1_POINT_2F hero_center);
 }
