@@ -755,8 +755,6 @@ namespace air
 
 		float fly_angle{ 0 };
 
-		RANDIT rand{};
-
 		EVILS(evils _what, float _sx, float _sy);
 
 	public:
@@ -781,6 +779,9 @@ namespace air
 		static EVILS* create(evils what, float sx, float sy);
 	};
 
+	// FUNCTIONS ***************************
 
-
+	float AIRFIGHT_API Distance(D2D1_POINT_2F first, D2D1_POINT_2F second);
+	void AIRFIGHT_API Sort(BAG<D2D1_RECT_F>& bag, D2D1_POINT_2F ref_point);
+	bool AIRFIGHT_API Intersect(D2D1_RECT_F first, D2D1_RECT_F second);
 }

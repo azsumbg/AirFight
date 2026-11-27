@@ -938,3 +938,46 @@ air::EVILS* air::EVILS::create(evils what, float sx, float sy)
 }
 
 /////////////////////////////////////////
+
+// FUNCTIONS ***************************
+
+float air::Distance(D2D1_POINT_2F first, D2D1_POINT_2F second)
+{
+	float a{ (float)(pow(abs(second.x - first.x), 2)) };
+	float b{ (float)(pow(abs(second.y - first.y), 2)) };
+
+	return (float)(sqrt(a + b));
+}
+void air::Sort(BAG<D2D1_RECT_F>& bag, D2D1_POINT_2F ref_point)
+{
+	if (bag.size() < 2)return;
+
+	bool ok{ false };
+
+	while (!ok)
+	{
+		ok = true;
+		for (size_t i = 0; i < bag.size() - 1; ++i)
+		{
+			D2D1_POINT_2F bag_center{ D2D1_POINT_2F(bag[i].left + (bag[i].right - bag[i].left) / 2.0f,
+				bag[i].top + (bag[i].bottom - bag[i].top) / 2.0f) };
+			D2D1_POINT_2F next_bag_center{ D2D1_POINT_2F(bag[i + 1].left + (bag[i + 1].right - bag[i + 1].left) / 2.0f,
+				bag[i + 1].top + (bag[i + 1].bottom - bag[i + 1].top) / 2.0f) };
+
+			if (Distance(bag_center, ref_point) > Distance(next_bag_center, ref_point))
+			{
+				D2D1_RECT_F temp{ bag[i] };
+
+				bag[i] = bag[i + 1];
+				bag[i + 1] = temp;
+
+				ok = false;
+			}
+		}
+	}
+}
+bool air::Intersect(D2D1_RECT_F first, D2D1_RECT_F second)
+{
+	return (!(first.left >= second.right || first.right <= second.left || first.top >= second.bottom || first.bottom <= 
+		second.top));
+}
