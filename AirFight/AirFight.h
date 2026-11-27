@@ -31,6 +31,7 @@ constexpr int ERR_ITERATOR{ 6005 };
 constexpr int EXPLOSION_ENDED{ -1 };
 
 enum class dirs { stop = 0, left = 1, right = 2, up = 3, down = 4, up_left = 5, up_right = 6, down_left = 7, down_right = 8 };
+enum class states { patrol = 0, move = 1, attack = 2 };
 
 enum class assets { armor = 0, gun = 1, points = 2, repair = 3 };
 enum class evils { amphibia = 0, bomber = 1, small_fighter = 2, fighter = 3, boss1 = 4, boss2 = 5 };
@@ -754,15 +755,19 @@ namespace air
 
 		float fly_angle{ 0 };
 
+		RANDIT rand{};
+
 		EVILS(evils _what, float _sx, float _sy);
 
 	public:
 		evils type{ evils::amphibia };
+		states state{ states::patrol };
+		
 		int lifes{ 0 };
 		int damage{ 0 };
 		int armor{ 0 };
 
-		bool move(float gear);
+		void move(float gear);
 
 		void set_fly_angle(float sx, float sy);
 		float get_fly_angle() const;

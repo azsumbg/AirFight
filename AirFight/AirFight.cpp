@@ -682,7 +682,7 @@ air::EVILS::EVILS(evils _what, float _sx, float _sy) :PROTON(_sx, _sy)
 	max_frame_delay = frame_delay;
 }
 
-bool air::EVILS::move(float gear)
+void air::EVILS::move(float gear)
 {
 	float my_speed = speed + gear / 10.0f;
 
@@ -690,30 +690,186 @@ bool air::EVILS::move(float gear)
 	start.y += move_next_y * my_speed;
 	set_edges();
 
-	if (start.x < 0)
+	if (move_ex > move_sx)
 	{
-		start.x = 0;
-		set_edges();
-	}
-	if (end.x > scr_width)
-	{
-		end.x = scr_width;
-		start.x = end.x - _width;
-		set_edges();
-	}
-	if (start.y < sky)
-	{
-		start.y = sky;
-		set_edges();
-	}
-	if (end.y > ground)
-	{
-		end.y = ground;
-		start.y = end.y - _height;
-		set_edges();
-	}
+		if (move_ey > move_sy)
+		{
+			if (center.x >= move_ex && center.y >= move_ey)
+			{
+				state = states::patrol;
+				
+				float tempX = scr_width;
+				float tempY = ground;
 
-	return true;
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey < move_sy)
+		{
+			if (center.x >= move_ex && center.y <= move_ey)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey == move_sy)
+		{
+			if (center.x >= move_ex)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+	}
+	else if (move_ex < move_sx)
+	{
+		if (move_ey > move_sy)
+		{
+			if (center.x <= move_ex && center.y >= move_ey)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey < move_sy)
+		{
+			if (center.x <= move_ex && center.y <= move_ey)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey == move_sy)
+		{
+			if (center.x <= move_ex)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+	}
+	else if (move_ex == move_sx)
+	{
+		if (move_ey > move_sy)
+		{
+			if (center.y >= move_ey)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey < move_sy)
+		{
+			if (center.y <= move_ey)
+			{
+				state = states::patrol;
+
+				float tempX = scr_width;
+				float tempY = ground;
+
+				if (center.x > scr_width / 2.0f)tempX = 0;
+				if (center.y > scr_height / 2.0f)tempY = sky;
+
+				set_path(tempX, tempY);
+			}
+		}
+		else if (move_ey == move_sy)
+		{
+			state = states::patrol;
+
+			float tempX = scr_width;
+			float tempY = ground;
+
+			if (center.x > scr_width / 2.0f)tempX = 0;
+			if (center.y > scr_height / 2.0f)tempY = sky;
+
+			set_path(tempX, tempY);
+		}
+	}
+	else
+	{
+		if (start.x <= -scr_width / 3.0f)
+		{
+			state = states::patrol;
+
+			float tempY{ ground };
+			if (center.y > scr_height / 2.0f)tempY = sky;
+
+			set_path(scr_width + scr_width / 3.0f, tempY);
+		}
+		if (end.x >= scr_width)
+		{
+			state = states::patrol;
+
+			float tempY{ ground };
+			if (center.y > scr_height / 2.0f)tempY = sky;
+
+			set_path(-scr_width / 3.0f, tempY);
+		}
+		if (start.y <= sky - 200.0f)
+		{
+			state = states::patrol;
+
+			float tempx{ scr_width + scr_width / 3.0f };
+			if (center.x > scr_width / 2.0f)tempx = -scr_width / 3.0f;
+
+			set_path(tempx, ground + 200.0f);
+		}
+		if (end.y >= ground + 200.0f)
+		{
+			state = states::patrol;
+
+			float tempx{ scr_width + scr_width / 3.0f };
+			if (center.x > scr_width / 2.0f)tempx = -scr_width / 3.0f;
+
+			set_path(tempx, sky - 200.0f);
+		}
+	}
 }
 
 void air::EVILS::set_fly_angle(float sx, float sy)
@@ -740,6 +896,7 @@ void air::EVILS::set_fly_angle(float sx, float sy)
 
 	fly_angle = std::atan2f(oppos, adjanced) + (180.0f / 3.1415);
 }
+
 float air::EVILS::get_fly_angle() const
 {
 	return fly_angle;
